@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minori 的笔记 · Blog</title>
-<meta name="description" content="Minori 的个人博客 — 技术、翻译与偶像文化随笔">
+<meta name="description" content="Minori 的个人博客">
 <style>
-  /* ============ Design tokens (Apple design system) ============ */
+  /* ============ Design tokens ============ */
   :root {
     --black: #000000;
     --gray-bg: #f5f5f7;
@@ -15,12 +15,13 @@
     --tertiary: rgba(0, 0, 0, 0.48);
     --blue: #0071e3;
     --link: #0066cc;
-    --link-dark: #2997ff;
-    --surface-card: #ffffff;
-    --radius: 12px;
+    --surface-card: rgba(255, 255, 255, 0.72);
+    --radius: 18px;
     --pill: 980px;
     --font-display: system-ui, -apple-system, "SF Pro Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     --font-text: system-ui, -apple-system, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ============ Base ============ */
@@ -28,23 +29,38 @@
   html { scroll-behavior: smooth; }
   body {
     font-family: var(--font-text);
-    background: var(--gray-bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.022em;
+    min-height: 100vh;
+    position: relative;
   }
   a { color: inherit; text-decoration: none; }
   button { font-family: inherit; cursor: pointer; border: none; background: none; }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
   ::selection { background: var(--blue); color: #fff; }
 
+  /* ============ Background system ============ */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: -1;
+    background-size: cover; background-position: center;
+    transition: opacity 0.8s var(--ease-out), transform 1.2s var(--ease-out);
+  }
+  .bg-layer.switching { opacity: 0; transform: scale(1.05); }
+  .bg-overlay {
+    position: fixed; inset: 0; z-index: -1;
+    background: rgba(255, 255, 255, 0.55);
+    pointer-events: none;
+  }
+
   /* ============ Nav (Apple glass) ============ */
   .nav {
     position: sticky; top: 0; z-index: 100;
-    height: 48px;
-    background: rgba(0, 0, 0, 0.8);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
+    height: 52px;
+    background: rgba(255, 255, 255, 0.65);
+    -webkit-backdrop-filter: saturate(200%) blur(30px);
+    backdrop-filter: saturate(200%) blur(30px);
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
   }
   .nav-inner {
     max-width: 980px; margin: 0 auto; height: 100%;
@@ -53,127 +69,177 @@
   }
   .nav-logo {
     font-family: var(--font-display);
-    font-size: 15px; font-weight: 600; color: #fff;
+    font-size: 16px; font-weight: 600; color: var(--ink);
     letter-spacing: -0.02em;
   }
-  .nav-links { display: flex; gap: 26px; margin-left: auto; }
+  .nav-links { display: flex; gap: 26px; margin-left: auto; align-items: center; }
   .nav-links a {
-    font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.8);
+    font-size: 13px; font-weight: 400; color: var(--body-text);
     transition: color .2s ease;
   }
-  .nav-links a:hover { color: #fff; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-user-btn {
+    font-size: 12px; font-weight: 500; color: #fff;
+    background: var(--blue);
+    padding: 6px 14px; border-radius: 20px;
+    transition: all .25s var(--spring);
+  }
+  .nav-user-btn:hover { transform: scale(1.05); }
 
-  /* ============ Hero (black, product-style) ============ */
-  .hero {
-    background: var(--black);
+  /* ============ Liquid Glass Button ============ */
+  .glass-btn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 32px;
+    font-size: 16px; font-weight: 500;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--pill);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    overflow: hidden;
+    transition: all .3s var(--spring);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+  .glass-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.1) 40%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.15) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .glass-btn::after {
+    content: '';
+    position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity .4s ease;
+    pointer-events: none;
+  }
+  .glass-btn:hover {
+    transform: scale(1.04);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.6),
+      0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  .glass-btn:hover::after { opacity: 1; }
+  .glass-btn:active { transform: scale(0.97); transition-duration: .1s; }
+  .glass-btn.primary {
+    background: rgba(0, 113, 227, 0.7);
     color: #fff;
+    border-color: rgba(0, 113, 227, 0.4);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+  .glass-btn.primary::before {
+    background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.05) 40%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.1) 100%);
+  }
+  .glass-btn.primary:hover {
+    background: rgba(0, 113, 227, 0.85);
+  }
+  .glass-btn.sm { padding: 8px 20px; font-size: 14px; }
+
+  /* ============ Hero ============ */
+  .hero {
     text-align: center;
-    padding: 96px 20px 110px;
+    padding: 100px 20px 120px;
   }
   .hero-kicker {
-    font-size: 14px; font-weight: 400; color: rgba(255, 255, 255, 0.6);
-    letter-spacing: 0.02em; margin-bottom: 14px;
+    font-size: 14px; font-weight: 500; color: var(--tertiary);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp .7s var(--ease-out) .1s forwards;
   }
   .hero h1 {
     font-family: var(--font-display);
-    font-size: clamp(34px, 5.2vw, 56px);
+    font-size: clamp(36px, 6vw, 64px);
     font-weight: 600;
-    line-height: 1.07;
-    letter-spacing: -0.005em;
-    max-width: 18em;
-    margin: 0 auto 18px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    max-width: 14em;
+    margin: 0 auto 20px;
     text-wrap: balance;
+    opacity: 0; transform: translateY(30px);
+    animation: fadeUp .8s var(--ease-out) .2s forwards;
   }
   .hero .hero-sub {
     font-family: var(--font-display);
-    font-size: clamp(17px, 2.2vw, 21px);
+    font-size: clamp(17px, 2.2vw, 22px);
     font-weight: 400;
-    line-height: 1.38;
-    color: rgba(255, 255, 255, 0.72);
-    max-width: 34em;
+    line-height: 1.4;
+    color: var(--body-text);
+    max-width: 30em;
     margin: 0 auto;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp .7s var(--ease-out) .35s forwards;
   }
-  .hero-meta {
-    margin-top: 20px;
-    font-size: 14px; color: rgba(255, 255, 255, 0.48);
-  }
-  .hero-meta .sep { margin: 0 10px; }
   .hero-ctas {
     display: flex; justify-content: center; align-items: center;
-    gap: 18px; flex-wrap: wrap;
-    margin-top: 34px;
+    gap: 14px; flex-wrap: wrap;
+    margin-top: 40px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp .7s var(--ease-out) .5s forwards;
   }
-  .btn-blue {
-    display: inline-block;
-    background: var(--blue); color: #fff;
-    font-size: 17px; font-weight: 400;
-    padding: 11px 24px;
-    border-radius: var(--pill);
-    transition: background .2s ease;
-  }
-  .btn-blue:hover { background: #0077ed; }
-  .btn-outline-light {
-    display: inline-block;
-    color: #fff;
-    font-size: 17px; font-weight: 400;
-    padding: 10px 23px;
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: var(--pill);
-    transition: border-color .2s ease, background .2s ease;
-  }
-  .btn-outline-light:hover { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
 
-  /* ============ Posts section (light gray) ============ */
-  .posts-section { background: var(--gray-bg); padding: 88px 20px 96px; }
-  .section-head { text-align: center; margin-bottom: 44px; }
+  /* ============ Scroll reveal ============ */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ============ Sections ============ */
+  .section {
+    padding: 80px 20px 90px;
+    position: relative;
+  }
+  .section-head { text-align: center; margin-bottom: 48px; }
   .section-head h2 {
     font-family: var(--font-display);
-    font-size: clamp(28px, 4vw, 40px);
-    font-weight: 600;
-    line-height: 1.1;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 600; line-height: 1.08;
     color: var(--ink);
   }
   .section-head p {
-    margin-top: 12px;
-    font-size: 17px; color: var(--tertiary);
+    margin-top: 12px; font-size: 17px; color: var(--tertiary);
   }
 
-  /* Filter pills */
-  .filter-bar {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    margin-bottom: 48px;
-  }
-  .pill {
-    background: var(--surface-card);
-    color: var(--body-text);
-    font-size: 14px; font-weight: 400;
-    padding: 8px 18px;
-    border-radius: var(--pill);
-    border: 3px solid rgba(0, 0, 0, 0.04);
-    transition: all .2s ease;
-  }
-  .pill:hover { color: var(--ink); box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 20px 0px; }
-  .pill.active { background: var(--blue); color: #fff; border-color: transparent; font-weight: 600; }
-
-  /* Tile grid */
+  /* ============ Tile grid (for future articles) ============ */
   .grid {
     max-width: 980px; margin: 0 auto;
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
   }
   .tile {
     background: var(--surface-card);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
     border-radius: var(--radius);
-    padding: 40px 36px 34px;
+    padding: 36px 32px 30px;
     display: flex; flex-direction: column;
     cursor: pointer;
-    transition: box-shadow .25s ease, transform .25s ease;
-    animation: rise .35s ease both;
+    transition: all .35s var(--spring);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
   }
   .tile:hover {
-    box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
-    transform: translateY(-3px);
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.85);
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   .tile-tag {
     font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
     color: var(--tertiary); text-transform: uppercase;
@@ -181,38 +247,38 @@
   }
   .tile h3 {
     font-family: var(--font-display);
-    font-size: 24px; font-weight: 600;
-    line-height: 1.22; letter-spacing: -0.01em;
+    font-size: 22px; font-weight: 600;
+    line-height: 1.25; letter-spacing: -0.01em;
     color: var(--ink);
   }
   .tile .tile-excerpt {
-    margin-top: 12px;
-    font-size: 14px; line-height: 1.5;
-    color: var(--body-text);
+    margin-top: 10px; font-size: 14px; line-height: 1.55;
+    color: var(--body-text); flex: 1;
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-    flex: 1;
   }
   .tile-foot {
     display: flex; justify-content: space-between; align-items: center;
-    margin-top: 24px;
+    margin-top: 20px;
   }
   .tile-date { font-size: 12px; color: var(--tertiary); }
-  .tile-link {
-    font-size: 14px; color: var(--link);
-    display: inline-flex; align-items: center; gap: 4px;
-  }
+  .tile-link { font-size: 14px; color: var(--link); display: inline-flex; align-items: center; gap: 4px; }
   .tile:hover .tile-link { text-decoration: underline; }
-  .tile-link .chev { transition: transform .2s ease; }
-  .tile:hover .tile-link .chev { transform: translateX(3px); }
+  .tile-link .chev { transition: transform .25s var(--spring); }
+  .tile:hover .tile-link .chev { transform: translateX(4px); }
 
-  .empty-note {
-    display: none; text-align: center;
-    padding: 60px 0; font-size: 17px; color: var(--tertiary);
+  .empty-state {
+    text-align: center; padding: 80px 20px;
+    grid-column: 1 / -1;
+  }
+  .empty-state .empty-icon {
+    font-size: 48px; margin-bottom: 16px; opacity: 0.4;
+  }
+  .empty-state p {
+    font-size: 17px; color: var(--tertiary); line-height: 1.5;
   }
 
-  /* ============ About section (black) ============ */
+  /* ============ About section ============ */
   .about {
-    background: var(--black); color: #fff;
     text-align: center;
     padding: 100px 20px 110px;
   }
@@ -223,17 +289,19 @@
   }
   .about .about-body {
     font-family: var(--font-display);
-    font-size: 19px; font-weight: 300; line-height: 1.55;
-    color: rgba(255, 255, 255, 0.72);
+    font-size: 19px; font-weight: 400; line-height: 1.55;
+    color: var(--body-text);
     max-width: 32em; margin: 22px auto 0;
   }
-  .about .hero-ctas { margin-top: 32px; }
+  .about .hero-ctas { margin-top: 36px; opacity: 1; transform: none; animation: none; }
 
   /* ============ Footer ============ */
   footer {
-    background: var(--gray-bg);
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
     padding: 22px 20px 30px;
+    background: rgba(245, 245, 247, 0.7);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
   .foot-inner {
     max-width: 980px; margin: 0 auto;
@@ -243,23 +311,29 @@
   footer a { color: var(--link); }
   footer a:hover { text-decoration: underline; }
 
-  /* ============ Article reader (white, clean) ============ */
+  /* ============ Article reader ============ */
   .reader {
     position: fixed; inset: 0; z-index: 200;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
     overflow-y: auto;
     opacity: 0; visibility: hidden;
-    transform: translateY(14px);
-    transition: opacity .28s ease, transform .28s ease, visibility .28s;
+    transition: opacity .4s var(--ease-out), visibility .4s;
   }
-  .reader.open { opacity: 1; visibility: visible; transform: none; }
-  .reader-inner { max-width: 700px; margin: 0 auto; padding: 44px 24px 110px; }
+  .reader.open { opacity: 1; visibility: visible; }
+  .reader-inner {
+    max-width: 700px; margin: 0 auto; padding: 44px 24px 110px;
+    transform: translateY(30px) scale(0.97);
+    transition: transform .5s var(--spring);
+  }
+  .reader.open .reader-inner { transform: none; }
   .back-btn {
     display: inline-flex; align-items: center; gap: 8px;
-    color: var(--link); font-size: 14px;
-    margin-bottom: 48px;
+    color: var(--link); font-size: 14px; margin-bottom: 48px;
+    transition: gap .2s var(--spring);
   }
-  .back-btn:hover { text-decoration: underline; }
+  .back-btn:hover { gap: 12px; }
   .reader-tag {
     font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--tertiary);
@@ -268,17 +342,186 @@
     font-family: var(--font-display);
     font-size: clamp(30px, 4.4vw, 44px);
     font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
-    margin: 14px 0 16px;
-    text-wrap: balance;
+    margin: 14px 0 16px; text-wrap: balance;
   }
   .reader-meta { font-size: 14px; color: var(--tertiary); }
   .reader-meta .sep { margin: 0 8px; }
   .reader-body { margin-top: 44px; }
   .reader-body p {
-    font-size: 17px; line-height: 1.76;
-    color: var(--body-text);
-    margin-bottom: 1.5em;
-    text-wrap: pretty;
+    font-size: 17px; line-height: 1.76; color: var(--body-text);
+    margin-bottom: 1.5em; text-wrap: pretty;
+  }
+
+  /* ============ Comments ============ */
+  .comments-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .comments-section h3 {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .comment-form {
+    display: flex; gap: 12px; margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .comment-form input, .comment-form textarea {
+    flex: 1; min-width: 200px;
+    padding: 12px 16px;
+    font-family: var(--font-text); font-size: 15px;
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    outline: none;
+    transition: all .25s ease;
+  }
+  .comment-form input:focus, .comment-form textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+  }
+  .comment-form textarea { min-height: 80px; resize: vertical; width: 100%; flex-basis: 100%; }
+  .comment {
+    display: flex; gap: 14px; margin-bottom: 20px;
+    animation: fadeUp .4s var(--ease-out) both;
+  }
+  .comment-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #5856d6);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600; flex-shrink: 0;
+  }
+  .comment-body { flex: 1; }
+  .comment-head {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;
+  }
+  .comment-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .comment-time { font-size: 12px; color: var(--tertiary); }
+  .comment-text { font-size: 15px; line-height: 1.5; color: var(--body-text); }
+  .no-comments { text-align: center; padding: 30px 0; color: var(--tertiary); font-size: 15px; }
+
+  /* ============ Login modal ============ */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0, 0, 0, 0.3);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: all .3s var(--ease-out);
+  }
+  .modal-overlay.open { opacity: 1; visibility: visible; }
+  .modal {
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 90%; max-width: 400px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+    transform: scale(0.92) translateY(20px);
+    transition: transform .4s var(--spring);
+  }
+  .modal-overlay.open .modal { transform: none; }
+  .modal h2 {
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 600; text-align: center;
+    margin-bottom: 8px;
+  }
+  .modal p {
+    text-align: center; font-size: 14px; color: var(--tertiary);
+    margin-bottom: 28px;
+  }
+  .modal-field {
+    margin-bottom: 16px;
+  }
+  .modal-field label {
+    display: block; font-size: 13px; font-weight: 500;
+    color: var(--body-text); margin-bottom: 6px;
+  }
+  .modal-field input {
+    width: 100%; padding: 12px 16px;
+    font-family: var(--font-text); font-size: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px; outline: none;
+    transition: all .25s ease;
+  }
+  .modal-field input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+  }
+  .modal-actions {
+    display: flex; gap: 10px; margin-top: 24px;
+  }
+  .modal-actions .glass-btn { flex: 1; }
+
+  /* ============ Background switcher ============ */
+  .bg-switcher {
+    position: fixed; bottom: 24px; right: 24px; z-index: 90;
+  }
+  .bg-toggle-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all .3s var(--spring);
+  }
+  .bg-toggle-btn:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.6); }
+  .bg-panel {
+    position: absolute; bottom: 60px; right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 16px;
+    min-width: 220px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    opacity: 0; visibility: hidden; transform: translateY(10px) scale(0.95);
+    transition: all .3s var(--spring);
+  }
+  .bg-panel.open { opacity: 1; visibility: visible; transform: none; }
+  .bg-panel h4 {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .bg-options {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .bg-option {
+    width: 56px; height: 56px; border-radius: 12px;
+    background-size: cover; background-position: center;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all .25s var(--spring);
+    position: relative; overflow: hidden;
+  }
+  .bg-option:hover { transform: scale(1.08); }
+  .bg-option.active { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+  .bg-option.none-bg {
+    background: var(--gray-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--tertiary);
+  }
+
+  /* ============ Animations ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
   }
 
   /* ============ Responsive ============ */
@@ -288,19 +531,24 @@
   }
   @media (max-width: 480px) {
     .hero { padding: 72px 20px 84px; }
-    .tile { padding: 32px 26px 28px; }
+    .tile { padding: 28px 22px 24px; }
     .nav-links a:nth-child(2) { display: none; }
+    .bg-switcher { bottom: 16px; right: 16px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     html { scroll-behavior: auto; }
   }
 </style>
 </head>
 <body>
 
-<!-- ================= Nav ================= -->
+<!-- Background layer -->
+<div class="bg-layer" id="bgLayer"></div>
+<div class="bg-overlay"></div>
+
+<!-- Nav -->
 <nav class="nav">
   <div class="nav-inner">
     <span class="nav-logo">Minori 的笔记</span>
@@ -308,43 +556,46 @@
       <a href="#posts">文章</a>
       <a href="#about">关于</a>
       <a href="https://github.com/minorri0414" target="_blank" rel="noopener">GitHub</a>
+      <button class="nav-user-btn" id="navUserBtn" onclick="handleUserAction()">登录</button>
     </div>
   </div>
 </nav>
 
-<!-- ================= Hero (featured article) ================= -->
+<!-- Hero -->
 <section class="hero">
-  <p class="hero-kicker" id="feat-kicker"></p>
-  <h1 id="feat-title"></h1>
-  <p class="hero-sub" id="feat-excerpt"></p>
-  <div class="hero-meta" id="feat-meta"></div>
+  <p class="hero-kicker">个人博客</p>
+  <h1>记录生活，<br>分享想法。</h1>
+  <p class="hero-sub">技术笔记、翻译心得、偶像随笔——把散落的想法钉在时间上。</p>
   <div class="hero-ctas">
-    <button class="btn-blue" id="feat-read">阅读全文</button>
-    <a class="btn-outline-light" href="#posts">浏览全部文章</a>
+    <a href="#posts" class="glass-btn primary">浏览文章</a>
+    <a href="#about" class="glass-btn">了解更多</a>
   </div>
 </section>
 
-<!-- ================= Posts ================= -->
-<section class="posts-section" id="posts">
-  <div class="section-head">
-    <h2>全部文章。</h2>
-    <p>技术、翻译、偶像随笔，想到什么写什么。</p>
+<!-- Posts -->
+<section class="section" id="posts">
+  <div class="section-head reveal">
+    <h2>全部文章</h2>
+    <p>这里还没有文章，敬请期待。</p>
   </div>
-  <div class="filter-bar" id="filterBar" role="tablist" aria-label="按标签筛选"></div>
-  <div class="grid" id="postGrid"></div>
-  <p class="empty-note" id="emptyNote">这个标签下还没有文章，去别处看看吧。</p>
+  <div class="grid reveal">
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>还没有发布任何文章。<br>新的故事正在路上～</p>
+    </div>
+  </div>
 </section>
 
-<!-- ================= About ================= -->
-<section class="about" id="about">
-  <h2>关于 Minori。</h2>
+<!-- About -->
+<section class="about reveal" id="about">
+  <h2>关于 Minori</h2>
   <p class="about-body">写代码、做翻译、追偶像。相信认真记录生活的人运气不会太差。这里是存放技术笔记、本地化心得与追星随笔的地方——把散落的想法钉在时间上。</p>
   <div class="hero-ctas">
-    <a class="btn-outline-light" href="https://github.com/minorri0414" target="_blank" rel="noopener">访问 GitHub ↗</a>
+    <a href="https://github.com/minorri0414" target="_blank" rel="noopener" class="glass-btn">访问 GitHub ↗</a>
   </div>
 </section>
 
-<!-- ================= Footer ================= -->
+<!-- Footer -->
 <footer>
   <div class="foot-inner">
     <span>Copyright © 2026 Minori. 由热爱驱动，认真记录。</span>
@@ -352,106 +603,57 @@
   </div>
 </footer>
 
-<!-- ================= Article reader ================= -->
-<div class="reader" id="reader" role="dialog" aria-modal="true">
+<!-- Article reader (with comments) -->
+<div class="reader" id="reader">
   <div class="reader-inner">
     <button class="back-btn" onclick="closeReader()">‹ 返回文章列表</button>
     <p class="reader-tag" id="reader-tag"></p>
     <h1 id="reader-title"></h1>
     <p class="reader-meta" id="reader-meta"></p>
     <div class="reader-body" id="reader-body"></div>
+    <div class="comments-section" id="commentsSection" style="display:none">
+      <h3>评论</h3>
+      <div class="comment-form" id="commentForm">
+        <input type="text" id="commentInput" placeholder="写下你的想法…">
+        <button class="glass-btn primary sm" onclick="submitComment()">发送</button>
+      </div>
+      <div id="commentList"></div>
+    </div>
   </div>
+</div>
+
+<!-- Login modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h2>加入讨论</h2>
+    <p>输入昵称和邮箱即可评论</p>
+    <div class="modal-field">
+      <label for="nickInput">昵称</label>
+      <input type="text" id="nickInput" placeholder="你的昵称">
+    </div>
+    <div class="modal-field">
+      <label for="emailInput">邮箱</label>
+      <input type="email" id="emailInput" placeholder="your@email.com">
+    </div>
+    <div class="modal-actions">
+      <button class="glass-btn" onclick="closeLogin()">取消</button>
+      <button class="glass-btn primary" onclick="doLogin()">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- Background switcher -->
+<div class="bg-switcher">
+  <div class="bg-panel" id="bgPanel">
+    <h4>更换背景</h4>
+    <div class="bg-options" id="bgOptions"></div>
+  </div>
+  <button class="bg-toggle-btn" onclick="toggleBgPanel()" aria-label="更换背景">🎨</button>
 </div>
 
 <script>
 /* ================= Data ================= */
-const posts = [
-  {
-    id: 1,
-    title: "翻译日志：如何把偶像的台词译得闪闪发光",
-    date: "2026-08-28",
-    tag: "translation", tagLabel: "翻译",
-    minutes: 8,
-    excerpt: "给 MORE MORE JUMP！做汉化时我反复琢磨一件事：「キラキラ」到底该译成什么？直译会丢掉温度，意译又怕用力过猛。这篇记录我的三条本地化原则。",
-    body: [
-      "给偶像游戏做本地化时，最难的不是语法，而是「温度」。日语文案里大量的拟声拟态词、语气词和敬语层级，构成了角色性格的一半。译成中文时如果只搬运字面意思，角色就会瞬间失去光泽。",
-      "我的第一条原则是：先读出声，再落笔。偶像台词是用来「说」的，译文的节奏感和口语感比准确性更优先。比如爱莉的口头禅，如果中文读起来拗口，再忠实也是失败的翻译。",
-      "第二条：保留角色的语言指纹。每个偶像都有自己独特的用词习惯，桃井爱莉喜欢叠加可爱词汇，日野下花帆的台词总是元气满满。译者要为每个角色维护一份「语言档案」，确保十句话之后她依然是她。",
-      "第三条，也是最重要的：译者的热情是藏不住的。当你真的喜欢这些角色，字里行间会自然流露出珍惜感。读者或许说不出哪里好，但能感觉到这份译文「懂她们」。一起闪耀吧——这句话我译了七个版本才定稿。"
-    ]
-  },
-  {
-    id: 2,
-    title: "我用一个周末给 Windows 登录界面做了个去模糊工具",
-    date: "2026-08-15",
-    tag: "tech", tagLabel: "技术",
-    minutes: 6,
-    excerpt: "实在受不了 Win11 登录界面的亚克力模糊，于是写了 DisableLockScreenBlur：改一个注册表项、带界面开关、一键还原。聊聊踩过的坑。",
-    body: [
-      "起因很简单：每次开机看到登录界面那团模糊的亚克力效果就浑身难受。网上零散的注册表教程要么步骤繁琐，要么改完无法还原，索性自己写个小工具。",
-      "核心其实是修改 HKLM 下的 DisableAcrylicBlur 键值。听起来一行命令的事，但实际要处理权限提升、不同 Windows 版本的差异、以及改完之后资源管理器不立即生效的问题。最后我选择用 .cmd 批处理加注册表导入的方式，右键「以管理员身份运行」就能完成。",
-      "最折腾的是还原逻辑。工具必须在修改前备份原始值，否则用户哪天想换回去就抓瞎了。现在它会自动生成 .reg 备份文件，双击即可还原。",
-      "开源到 GitHub 之后意外收到好几封感谢邮件，有人还提了多语言需求。小小的工具能帮到陌生人，这种感觉真好。"
-    ]
-  },
-  {
-    id: 3,
-    title: "MORE MORE JUMP！四周年：写给一直奔跑的她们",
-    date: "2026-08-02",
-    tag: "idol", tagLabel: "偶像",
-    minutes: 5,
-    excerpt: "从默默无闻到武道馆，MMJ 的故事之所以动人，是因为她们不是天才，而是普通人拼命努力的样子。四周年活动随笔，含一点点泪目预警。",
-    body: [
-      "四周年活动剧情打完最后一章，我在屏幕前坐了很久。MORE MORE JUMP！最厉害的地方在于，她们从不回避「偶像也有普通人的一面」这件事。",
-      "爱莉做过地下偶像、雫在学业和舞台间挣扎、实乃理被说过「你不行」、花帆则是那个永远在大家想放弃时喊出「再来一次」的人。她们的闪耀不是天赋的闪耀，是不放弃的闪耀。",
-      "我特别喜欢这个组合传递的信息：希望是可以传递的。当你在舞台上发光的时候，台下的某个人也会因此获得继续努力的勇气。这大概就是我一边翻译她们的台词、一边觉得自己也被治愈的原因。",
-      "四周年快乐。接下来也要一起，向着更亮的光奔跑。"
-    ]
-  },
-  {
-    id: 4,
-    title: "批处理脚本入门：写给想自动化一切的你",
-    date: "2026-07-20",
-    tag: "tech", tagLabel: "技术",
-    minutes: 10,
-    excerpt: "很多人觉得 .bat 是老古董，但在 Windows 上它依然是分发「一键修复脚本」最顺手的方式。这篇整理了我写批处理时总结的保命技巧。",
-    body: [
-      "PowerShell 更强大没错，但当你想把一个修复脚本发给不太懂电脑的朋友时，「右键 → 以管理员身份运行」的 .cmd 文件依然是摩擦最小的方案。",
-      "第一个保命技巧：永远在脚本开头用 net session 检测管理员权限，没拿到权限就提示并退出，而不是让脚本跑到一半因为权限不足改坏东西。",
-      "第二个技巧：所有注册表修改前先用 reg query 读取并备份当前值。这样即使脚本逻辑出错，用户也有一键还原的退路。",
-      "第三个技巧：结尾永远放 pause。窗口一闪而过是批处理新手最常见的事故，用户根本来不及看到执行结果。把这三条做好，你的脚本已经超过了八成网上流传的「优化脚本」。"
-    ]
-  },
-  {
-    id: 5,
-    title: "偶像歌曲里的「闪耀感」到底从哪来",
-    date: "2026-07-05",
-    tag: "idol", tagLabel: "偶像",
-    minutes: 7,
-    excerpt: "为什么有的偶像曲一听就想打 call？试着从编曲角度拆解：BPM、和弦进行、call 的留白设计，以及副歌前那半拍的静默。",
-    body: [
-      "最近反复循环偶像歌曲时冒出一个念头：「闪耀感」能被量化吗？抱着玩的心态拆了几首，发现确实有规律可循。",
-      "首先是速度。让人想跟着跳的偶像曲 BPM 大多落在 160 到 180 之间，这个区间恰好接近人在兴奋状态下的心率两倍，身体会本能地跟着动。",
-      "其次是和弦。日系偶像曲大量使用四级起始的进行（IV-V-iii-vi），这种进行自带「向前奔跑」的推进感，而且副歌几乎都从大调和弦开始——情绪一下子被点亮。",
-      "最妙的是留白。很多神曲在最后一句副歌前会突然抽空所有乐器半拍，只留人声，然后全场乐器砸回来。那半拍的寂静，就是台下所有人屏住呼吸的瞬间。闪耀感，原来是精心设计的心跳。"
-    ]
-  },
-  {
-    id: 6,
-    title: "我的第一篇博客：为什么要开始写东西",
-    date: "2026-06-21",
-    tag: "blog", tagLabel: "随笔",
-    minutes: 3,
-    excerpt: "收藏夹里躺了几百篇别人的文章，却从没留下自己的。今天决定开始写：不为流量，只为把散落的想法钉在时间上。",
-    body: [
-      "建博客这个念头在脑子里转了快一年。每次看完一篇好文章就想「我也要写」，然后打开游戏，念头就散了。",
-      "促使我动手的是一件小事：半年前我解决过一个技术难题，当时的思路全在脑子里，没记录。上个月遇到类似问题，我盯着屏幕完全想不起自己当时是怎么解的。那一刻意识到，不写下来的思考等于没发生。",
-      "所以这个博客的定位很简单：技术笔记、翻译心得、追星随笔，想到什么写什么。不追热点，不焦虑阅读量。把散落的想法钉在时间上，未来的我会感谢现在的我。",
-      "如果你也是从第一篇开始的，欢迎一起坚持。"
-    ]
-  }
-];
-
+const posts = [];
 const TAGS = [
   { key: "all", label: "全部" },
   { key: "tech", label: "技术" },
@@ -460,67 +662,158 @@ const TAGS = [
   { key: "blog", label: "随笔" }
 ];
 
+const BACKGROUNDS = [
+  { id: "none", name: "默认", url: "" },
+  { id: "sakura", name: "樱花", url: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1920&q=80" },
+  { id: "night", name: "星空", url: "https://images.unsplash.com/photo-1519638831568-d9897f54ed69?w=1920&q=80" },
+  { id: "ocean", name: "海洋", url: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1920&q=80" },
+  { id: "mountain", name: "山峦", url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80" },
+  { id: "mmj", name: "舞台", url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80" },
+  { id: "forest", name: "森林", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80" },
+  { id: "city", name: "城市", url: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920&q=80" },
+  { id: "sunset", name: "日落", url: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=1920&q=80" },
+];
+
 /* ================= State ================= */
-let activeTag = "all";
 const $ = (s) => document.querySelector(s);
-const fmtDate = (d) => { const [y, m, day] = d.split("-"); return `${y} 年 ${Number(m)} 月 ${Number(day)} 日`; };
+const $$ = (s) => document.querySelectorAll(s);
 
-/* ================= Featured / Hero ================= */
-const featured = posts[0];
-function renderFeatured() {
-  $("#feat-kicker").textContent = "最新 · " + featured.tagLabel;
-  $("#feat-title").textContent = featured.title;
-  $("#feat-excerpt").textContent = featured.excerpt;
-  $("#feat-meta").innerHTML =
-    `${fmtDate(featured.date)}<span class="sep">·</span>约 ${featured.minutes} 分钟阅读`;
-  $("#feat-read").onclick = () => openReader(featured.id);
+function loadUser() {
+  try { return JSON.parse(localStorage.getItem("blog_user")) || null; } catch { return null; }
+}
+function saveUser(user) { localStorage.setItem("blog_user", JSON.stringify(user)); }
+function loadComments() {
+  try { return JSON.parse(localStorage.getItem("blog_comments")) || {}; } catch { return {}; }
+}
+function saveComments(data) { localStorage.setItem("blog_comments", JSON.stringify(data)); }
+function loadBg() { return localStorage.getItem("blog_bg") || "none"; }
+function saveBg(id) { localStorage.setItem("blog_bg", id); }
+
+let currentUser = loadUser();
+let currentArticleId = null;
+
+/* ================= Background ================= */
+function applyBg(id) {
+  const bg = BACKGROUNDS.find(b => b.id === id);
+  const layer = $("#bgLayer");
+  if (!bg || !bg.url) {
+    layer.classList.add("switching");
+    setTimeout(() => { layer.style.backgroundImage = "none"; layer.classList.remove("switching"); }, 400);
+    saveBg("none");
+  } else {
+    layer.classList.add("switching");
+    setTimeout(() => {
+      layer.style.backgroundImage = `url(${bg.url})`;
+      setTimeout(() => layer.classList.remove("switching"), 50);
+    }, 400);
+    saveBg(id);
+  }
+  $$(".bg-option").forEach(opt => opt.classList.toggle("active", opt.dataset.id === id));
 }
 
-/* ================= Filter bar ================= */
-function renderFilters() {
-  const bar = $("#filterBar");
-  bar.innerHTML = TAGS.map(t =>
-    `<button class="pill${t.key === activeTag ? " active" : ""}" data-tag="${t.key}" role="tab" aria-selected="${t.key === activeTag}">${t.label}</button>`
-  ).join("");
-  bar.querySelectorAll(".pill").forEach(btn => {
-    btn.addEventListener("click", () => {
-      activeTag = btn.dataset.tag;
-      renderFilters();
-      renderGrid();
-    });
-  });
+function renderBgOptions() {
+  const container = $("#bgOptions");
+  container.innerHTML = BACKGROUNDS.map(b => {
+    if (b.id === "none") {
+      return `<button class="bg-option none-bg ${loadBg() === 'none' ? 'active' : ''}" data-id="none" onclick="applyBg('none')">无</button>`;
+    }
+    return `<button class="bg-option ${loadBg() === b.id ? 'active' : ''}" data-id="${b.id}" style="background-image:url(${b.url})" title="${b.name}" onclick="applyBg('${b.id}')"></button>`;
+  }).join("");
 }
 
-/* ================= Post grid ================= */
-function renderGrid() {
-  const grid = $("#postGrid");
-  const filtered = activeTag === "all" ? posts : posts.filter(p => p.tag === activeTag);
-  $("#emptyNote").style.display = filtered.length ? "none" : "block";
-  grid.innerHTML = filtered.map((p, i) => `
-    <article class="tile" data-id="${p.id}" style="animation-delay:${i * 50}ms" tabindex="0" role="button" aria-label="阅读：${p.title}">
-      <p class="tile-tag">${p.tagLabel}</p>
-      <h3>${p.title}</h3>
-      <p class="tile-excerpt">${p.excerpt}</p>
-      <div class="tile-foot">
-        <span class="tile-date">${fmtDate(p.date)} · 约 ${p.minutes} 分钟</span>
-        <span class="tile-link">阅读全文 <span class="chev">›</span></span>
+function toggleBgPanel() { $("#bgPanel").classList.toggle("open"); }
+
+/* ================= User / Login ================= */
+function updateNavUser() {
+  const btn = $("#navUserBtn");
+  if (currentUser) {
+    btn.textContent = currentUser.nick;
+    btn.title = "点击登出";
+  } else {
+    btn.textContent = "登录";
+    btn.title = "";
+  }
+}
+
+function handleUserAction() {
+  if (currentUser) {
+    currentUser = null;
+    localStorage.removeItem("blog_user");
+    updateNavUser();
+  } else {
+    openLogin();
+  }
+}
+
+function openLogin() {
+  $("#loginModal").classList.add("open");
+  $("#nickInput").value = "";
+  $("#emailInput").value = "";
+  setTimeout(() => $("#nickInput").focus(), 300);
+}
+
+function closeLogin() { $("#loginModal").classList.remove("open"); }
+
+function doLogin() {
+  const nick = $("#nickInput").value.trim();
+  const email = $("#emailInput").value.trim();
+  if (!nick || !email) return;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert("邮箱格式不对哦"); return; }
+  currentUser = { nick, email };
+  saveUser(currentUser);
+  updateNavUser();
+  closeLogin();
+}
+
+/* ================= Comments ================= */
+function renderComments(articleId) {
+  const comments = loadComments();
+  const list = comments[articleId] || [];
+  const container = $("#commentList");
+  if (!list.length) {
+    container.innerHTML = '<p class="no-comments">还没有评论，来做第一个吧～</p>';
+    return;
+  }
+  container.innerHTML = list.map(c => `
+    <div class="comment">
+      <div class="comment-avatar">${c.nick.charAt(0).toUpperCase()}</div>
+      <div class="comment-body">
+        <div class="comment-head">
+          <span class="comment-name">${c.nick}</span>
+          <span class="comment-time">${c.time}</span>
+        </div>
+        <p class="comment-text">${c.text}</p>
       </div>
-    </article>`).join("");
-  grid.querySelectorAll(".tile").forEach(tile => {
-    const open = () => openReader(Number(tile.dataset.id));
-    tile.addEventListener("click", open);
-    tile.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
-  });
+    </div>
+  `).join("");
+}
+
+function submitComment() {
+  if (!currentUser) { openLogin(); return; }
+  const input = $("#commentInput");
+  const text = input.value.trim();
+  if (!text) return;
+  const comments = loadComments();
+  if (!comments[currentArticleId]) comments[currentArticleId] = [];
+  const now = new Date();
+  const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  comments[currentArticleId].push({ nick: currentUser.nick, text, time: timeStr });
+  saveComments(comments);
+  input.value = "";
+  renderComments(currentArticleId);
 }
 
 /* ================= Reader ================= */
 function openReader(id) {
   const p = posts.find(x => x.id === id);
   if (!p) return;
+  currentArticleId = id;
   $("#reader-tag").textContent = p.tagLabel;
   $("#reader-title").textContent = p.title;
   $("#reader-meta").innerHTML = `${fmtDate(p.date)}<span class="sep">·</span>约 ${p.minutes} 分钟阅读`;
   $("#reader-body").innerHTML = p.body.map(t => `<p>${t}</p>`).join("");
+  $("#commentsSection").style.display = "block";
+  renderComments(id);
   $("#reader").classList.add("open");
   $("#reader").scrollTop = 0;
   document.body.style.overflow = "hidden";
@@ -528,13 +821,37 @@ function openReader(id) {
 function closeReader() {
   $("#reader").classList.remove("open");
   document.body.style.overflow = "";
+  currentArticleId = null;
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeReader(); });
+
+/* ================= Utils ================= */
+const fmtDate = (d) => { const [y, m, day] = d.split("-"); return `${y} 年 ${Number(m)} 月 ${Number(day)} 日`; };
+
+/* ================= Scroll reveal ================= */
+function initReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  $$(".reveal").forEach(el => observer.observe(el));
+}
 
 /* ================= Init ================= */
-renderFeatured();
-renderFilters();
-renderGrid();
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { closeReader(); closeLogin(); }
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest(".bg-switcher")) $("#bgPanel").classList.remove("open");
+});
+
+renderBgOptions();
+applyBg(loadBg());
+updateNavUser();
+initReveal();
 </script>
 </body>
 </html>
