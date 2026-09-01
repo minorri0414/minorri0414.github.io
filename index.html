@@ -5,263 +5,291 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minori 的笔记 · Blog</title>
 <meta name="description" content="Minori 的个人博客 — 技术、翻译与偶像文化随笔">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* ============ Design tokens ============ */
+  /* ============ Design tokens (Apple design system) ============ */
   :root {
-    --paper: #faf6ef;
-    --surface: #ffffff;
-    --ink: #211a12;
-    --muted: #7d7164;
-    --line: #e8dfd0;
-    --accent: #c44b28;
-    --accent-ink: #ffffff;
-    --accent-soft: #f9e9e1;
-    --serif: "Noto Serif SC", Georgia, "Songti SC", "SimSun", serif;
-    --sans: "Noto Sans SC", -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-    --shadow: 0 1px 2px rgba(33, 26, 18, .05);
-  }
-  [data-theme="dark"] {
-    --paper: #16130e;
-    --surface: #201b13;
-    --ink: #ece3d3;
-    --muted: #9d9080;
-    --line: #322b20;
-    --accent: #ff7a50;
-    --accent-ink: #1c130c;
-    --accent-soft: #33231a;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    --black: #000000;
+    --gray-bg: #f5f5f7;
+    --ink: #1d1d1f;
+    --body-text: rgba(0, 0, 0, 0.8);
+    --tertiary: rgba(0, 0, 0, 0.48);
+    --blue: #0071e3;
+    --link: #0066cc;
+    --link-dark: #2997ff;
+    --surface-card: #ffffff;
+    --radius: 12px;
+    --pill: 980px;
+    --font-display: system-ui, -apple-system, "SF Pro Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-text: system-ui, -apple-system, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   }
 
   /* ============ Base ============ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    font-family: var(--sans);
-    background: var(--paper);
+    font-family: var(--font-text);
+    background: var(--gray-bg);
     color: var(--ink);
-    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    transition: background .25s ease, color .25s ease;
+    letter-spacing: -0.022em;
   }
   a { color: inherit; text-decoration: none; }
-  button { font-family: inherit; cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
-  ::selection { background: var(--accent); color: var(--accent-ink); }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+  ::selection { background: var(--blue); color: #fff; }
 
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  /* ============ Nav (Apple glass) ============ */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.8);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+  .nav-inner {
+    max-width: 980px; margin: 0 auto; height: 100%;
+    display: flex; align-items: center; gap: 28px;
+    padding: 0 20px;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 15px; font-weight: 600; color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 26px; margin-left: auto; }
+  .nav-links a {
+    font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.8);
+    transition: color .2s ease;
+  }
+  .nav-links a:hover { color: #fff; }
 
-  /* ============ Masthead ============ */
-  .masthead {
-    border-bottom: 1px solid var(--line);
-    background: var(--paper);
-    position: sticky; top: 0; z-index: 20;
-    backdrop-filter: none;
+  /* ============ Hero (black, product-style) ============ */
+  .hero {
+    background: var(--black);
+    color: #fff;
+    text-align: center;
+    padding: 96px 20px 110px;
   }
-  .masthead .wrap {
-    display: flex; align-items: center; gap: 20px;
-    height: 68px;
+  .hero-kicker {
+    font-size: 14px; font-weight: 400; color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.02em; margin-bottom: 14px;
   }
-  .site-title {
-    font-family: var(--serif);
-    font-size: 22px; font-weight: 900; letter-spacing: .02em;
-    white-space: nowrap;
-  }
-  .site-title .dot { color: var(--accent); }
-  .site-sub {
-    font-size: 12px; color: var(--muted); letter-spacing: .14em;
-    text-transform: uppercase; margin-top: 2px;
-  }
-  .nav { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-  .nav a {
-    font-size: 14px; font-weight: 500; color: var(--muted);
-    padding: 8px 12px; border-radius: 6px;
-    transition: color .15s ease, background .15s ease;
-  }
-  .nav a:hover, .nav a.active { color: var(--ink); background: var(--accent-soft); }
-  .nav a.active { color: var(--accent); font-weight: 700; }
-  .theme-btn {
-    width: 38px; height: 38px; border-radius: 50%;
-    border: 1px solid var(--line); background: var(--surface);
-    color: var(--ink); display: grid; place-items: center;
-    margin-left: 10px;
-    transition: border-color .15s ease, transform .15s ease;
-  }
-  .theme-btn:hover { border-color: var(--accent); transform: rotate(15deg); }
-  .theme-btn svg { width: 18px; height: 18px; }
-  .icon-sun { display: none; }
-  [data-theme="dark"] .icon-sun { display: block; }
-  [data-theme="dark"] .icon-moon { display: none; }
-
-  /* ============ Featured ============ */
-  .featured { padding: 64px 0 48px; border-bottom: 1px solid var(--line); }
-  .kicker {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 12px; font-weight: 700; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--accent);
-  }
-  .kicker::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
-  .featured h1 {
-    font-family: var(--serif);
-    font-size: clamp(30px, 4.6vw, 46px);
-    font-weight: 900; line-height: 1.28;
-    margin: 18px 0 16px; max-width: 20em;
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 5.2vw, 56px);
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.005em;
+    max-width: 18em;
+    margin: 0 auto 18px;
     text-wrap: balance;
   }
-  .featured .excerpt {
-    font-size: 16.5px; color: var(--muted); max-width: 38em;
+  .hero .hero-sub {
+    font-family: var(--font-display);
+    font-size: clamp(17px, 2.2vw, 21px);
+    font-weight: 400;
+    line-height: 1.38;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 34em;
+    margin: 0 auto;
   }
-  .meta-row {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
-    margin-top: 22px; font-size: 13px; color: var(--muted);
+  .hero-meta {
+    margin-top: 20px;
+    font-size: 14px; color: rgba(255, 255, 255, 0.48);
   }
-  .meta-row .sep { opacity: .5; }
-  .read-link {
-    display: inline-flex; align-items: center; gap: 8px;
-    margin-top: 26px; padding: 11px 22px;
-    background: var(--accent); color: var(--accent-ink);
-    border: none; border-radius: 8px;
-    font-size: 14.5px; font-weight: 700;
-    transition: transform .15s ease, box-shadow .15s ease;
+  .hero-meta .sep { margin: 0 10px; }
+  .hero-ctas {
+    display: flex; justify-content: center; align-items: center;
+    gap: 18px; flex-wrap: wrap;
+    margin-top: 34px;
   }
-  .read-link:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -6px var(--accent); }
-  .read-link .arrow { transition: transform .15s ease; }
-  .read-link:hover .arrow { transform: translateX(3px); }
+  .btn-blue {
+    display: inline-block;
+    background: var(--blue); color: #fff;
+    font-size: 17px; font-weight: 400;
+    padding: 11px 24px;
+    border-radius: var(--pill);
+    transition: background .2s ease;
+  }
+  .btn-blue:hover { background: #0077ed; }
+  .btn-outline-light {
+    display: inline-block;
+    color: #fff;
+    font-size: 17px; font-weight: 400;
+    padding: 10px 23px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--pill);
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .btn-outline-light:hover { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
 
-  /* ============ Main grid ============ */
-  .grid {
-    display: grid; grid-template-columns: 1fr 272px; gap: 56px;
-    padding: 48px 0 72px;
+  /* ============ Posts section (light gray) ============ */
+  .posts-section { background: var(--gray-bg); padding: 88px 20px 96px; }
+  .section-head { text-align: center; margin-bottom: 44px; }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .section-head p {
+    margin-top: 12px;
+    font-size: 17px; color: var(--tertiary);
   }
 
-  /* ---- Filter ---- */
-  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  /* Filter pills */
+  .filter-bar {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 48px;
+  }
   .pill {
-    border: 1px solid var(--line); background: transparent;
-    color: var(--muted); font-size: 13px; font-weight: 500;
-    padding: 6px 15px; border-radius: 999px;
-    transition: all .15s ease;
+    background: var(--surface-card);
+    color: var(--body-text);
+    font-size: 14px; font-weight: 400;
+    padding: 8px 18px;
+    border-radius: var(--pill);
+    border: 3px solid rgba(0, 0, 0, 0.04);
+    transition: all .2s ease;
   }
-  .pill:hover { border-color: var(--accent); color: var(--accent); }
-  .pill.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+  .pill:hover { color: var(--ink); box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 20px 0px; }
+  .pill.active { background: var(--blue); color: #fff; border-color: transparent; font-weight: 600; }
 
-  .section-label {
-    font-size: 13px; font-weight: 700; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--muted);
-    margin: 26px 0 4px;
+  /* Tile grid */
+  .grid {
+    max-width: 980px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
   }
-
-  /* ---- Post list ---- */
-  .post-list { list-style: none; }
-  .post-item {
-    display: grid; grid-template-columns: 96px 1fr; gap: 20px;
-    padding: 22px 8px; border-bottom: 1px solid var(--line);
-    cursor: pointer; border-radius: 8px 8px 0 0;
-    transition: background .15s ease;
-    animation: rise .3s ease both;
+  .tile {
+    background: var(--surface-card);
+    border-radius: var(--radius);
+    padding: 40px 36px 34px;
+    display: flex; flex-direction: column;
+    cursor: pointer;
+    transition: box-shadow .25s ease, transform .25s ease;
+    animation: rise .35s ease both;
   }
-  .post-item:first-of-type { border-top: 1px solid var(--line); }
-  .post-item:hover { background: var(--surface); }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  .post-date {
-    font-size: 13px; color: var(--muted); padding-top: 3px;
-    font-variant-numeric: tabular-nums; white-space: nowrap;
+  .tile:hover {
+    box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
+    transform: translateY(-3px);
   }
-  .post-title {
-    font-family: var(--serif); font-size: 19.5px; font-weight: 700;
-    line-height: 1.4; transition: color .15s ease;
-  }
-  .post-item:hover .post-title { color: var(--accent); }
-  .post-excerpt {
-    font-size: 14px; color: var(--muted); margin-top: 6px;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .post-tags { display: flex; gap: 8px; margin-top: 10px; }
-  .tag {
-    font-size: 12px; font-weight: 500; color: var(--accent);
-    background: var(--accent-soft); padding: 2px 10px; border-radius: 999px;
-  }
-  .readtime { font-size: 12px; color: var(--muted); align-self: center; }
-  .empty-note { padding: 40px 0; color: var(--muted); font-size: 14px; display: none; }
-
-  /* ---- Sidebar ---- */
-  .sidebar { display: flex; flex-direction: column; gap: 36px; }
-  .side-block h3 {
-    font-size: 13px; font-weight: 700; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
-  }
-  .about-card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 12px; padding: 20px; box-shadow: var(--shadow);
-  }
-  .about-card .avatar {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent);
-    display: grid; place-items: center;
-    font-family: var(--serif); font-size: 24px; font-weight: 900;
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .tile-tag {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--tertiary); text-transform: uppercase;
     margin-bottom: 12px;
   }
-  .about-card p { font-size: 13.5px; color: var(--muted); }
-  .cat-list { list-style: none; }
-  .cat-list li { display: flex; justify-content: space-between; padding: 9px 2px; border-bottom: 1px dashed var(--line); font-size: 14px; }
-  .cat-list li:last-child { border-bottom: none; }
-  .cat-list button { background: none; border: none; color: var(--ink); font-size: 14px; transition: color .15s; }
-  .cat-list button:hover { color: var(--accent); }
-  .cat-list .count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .tile h3 {
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 600;
+    line-height: 1.22; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .tile .tile-excerpt {
+    margin-top: 12px;
+    font-size: 14px; line-height: 1.5;
+    color: var(--body-text);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    flex: 1;
+  }
+  .tile-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 24px;
+  }
+  .tile-date { font-size: 12px; color: var(--tertiary); }
+  .tile-link {
+    font-size: 14px; color: var(--link);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .tile:hover .tile-link { text-decoration: underline; }
+  .tile-link .chev { transition: transform .2s ease; }
+  .tile:hover .tile-link .chev { transform: translateX(3px); }
 
-  /* ============ Article reader ============ */
-  .reader {
-    position: fixed; inset: 0; z-index: 50;
-    background: var(--paper);
-    overflow-y: auto;
-    opacity: 0; visibility: hidden;
-    transform: translateY(12px);
-    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+  .empty-note {
+    display: none; text-align: center;
+    padding: 60px 0; font-size: 17px; color: var(--tertiary);
   }
-  .reader.open { opacity: 1; visibility: visible; transform: none; }
-  .reader .wrap { max-width: 720px; padding-top: 40px; padding-bottom: 96px; }
-  .back-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: none; border: 1px solid var(--line); border-radius: 999px;
-    color: var(--muted); font-size: 13.5px; font-weight: 500;
-    padding: 8px 18px; margin-bottom: 40px;
-    transition: all .15s ease;
+
+  /* ============ About section (black) ============ */
+  .about {
+    background: var(--black); color: #fff;
+    text-align: center;
+    padding: 100px 20px 110px;
   }
-  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .reader .kicker { margin-bottom: 4px; }
-  .reader h1 {
-    font-family: var(--serif); font-size: clamp(28px, 4vw, 40px);
-    font-weight: 900; line-height: 1.3; margin: 16px 0 18px;
-    text-wrap: balance;
+  .about h2 {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 48px);
+    font-weight: 600; line-height: 1.08; letter-spacing: -0.005em;
   }
-  .reader .body { font-family: var(--serif); font-size: 17px; line-height: 1.95; margin-top: 34px; }
-  .reader .body p { margin-bottom: 1.4em; text-wrap: pretty; }
-  .reader .body p:first-child::first-letter {
-    font-size: 2.6em; font-weight: 900; float: left;
-    line-height: 1; padding: 4px 10px 0 0; color: var(--accent);
+  .about .about-body {
+    font-family: var(--font-display);
+    font-size: 19px; font-weight: 300; line-height: 1.55;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 32em; margin: 22px auto 0;
   }
+  .about .hero-ctas { margin-top: 32px; }
 
   /* ============ Footer ============ */
-  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
-  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; font-size: 13px; color: var(--muted); }
-  footer a { color: var(--accent); font-weight: 500; }
+  footer {
+    background: var(--gray-bg);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 22px 20px 30px;
+  }
+  .foot-inner {
+    max-width: 980px; margin: 0 auto;
+    font-size: 12px; color: var(--tertiary);
+    display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+  }
+  footer a { color: var(--link); }
   footer a:hover { text-decoration: underline; }
 
-  /* ============ Responsive ============ */
-  @media (max-width: 880px) {
-    .grid { grid-template-columns: 1fr; gap: 40px; }
-    .sidebar { flex-direction: row; flex-wrap: wrap; }
-    .side-block { flex: 1 1 240px; }
+  /* ============ Article reader (white, clean) ============ */
+  .reader {
+    position: fixed; inset: 0; z-index: 200;
+    background: #fff;
+    overflow-y: auto;
+    opacity: 0; visibility: hidden;
+    transform: translateY(14px);
+    transition: opacity .28s ease, transform .28s ease, visibility .28s;
   }
-  @media (max-width: 640px) {
-    .masthead .wrap { height: auto; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
-    .site-sub { display: none; }
-    .nav { margin-left: 0; width: 100%; order: 3; justify-content: flex-start; }
-    .featured { padding: 44px 0 36px; }
-    .post-item { grid-template-columns: 1fr; gap: 6px; }
-    .post-date { order: 2; margin-top: 4px; }
+  .reader.open { opacity: 1; visibility: visible; transform: none; }
+  .reader-inner { max-width: 700px; margin: 0 auto; padding: 44px 24px 110px; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--link); font-size: 14px;
+    margin-bottom: 48px;
+  }
+  .back-btn:hover { text-decoration: underline; }
+  .reader-tag {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--tertiary);
+  }
+  .reader h1 {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 44px);
+    font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
+    margin: 14px 0 16px;
+    text-wrap: balance;
+  }
+  .reader-meta { font-size: 14px; color: var(--tertiary); }
+  .reader-meta .sep { margin: 0 8px; }
+  .reader-body { margin-top: 44px; }
+  .reader-body p {
+    font-size: 17px; line-height: 1.76;
+    color: var(--body-text);
+    margin-bottom: 1.5em;
+    text-wrap: pretty;
+  }
+
+  /* ============ Responsive ============ */
+  @media (max-width: 833px) {
+    .grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 18px; }
+  }
+  @media (max-width: 480px) {
+    .hero { padding: 72px 20px 84px; }
+    .tile { padding: 32px 26px 28px; }
+    .nav-links a:nth-child(2) { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -272,84 +300,68 @@
 </head>
 <body>
 
-<!-- ================= Masthead ================= -->
-<header class="masthead">
-  <div class="wrap">
-    <div>
-      <a href="#" class="site-title" onclick="closeReader(event)">Minori<span class="dot">·</span>笔记</a>
-      <div class="site-sub">Tech · Translation · Idol Culture</div>
-    </div>
-    <nav class="nav">
-      <a href="#" class="active">首页</a>
+<!-- ================= Nav ================= -->
+<nav class="nav">
+  <div class="nav-inner">
+    <span class="nav-logo">Minori 的笔记</span>
+    <div class="nav-links">
       <a href="#posts">文章</a>
       <a href="#about">关于</a>
-      <button class="theme-btn" id="themeToggle" aria-label="切换深色/浅色模式" title="切换主题">
-        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      </button>
-    </nav>
+      <a href="https://github.com/minorri0414" target="_blank" rel="noopener">GitHub</a>
+    </div>
   </div>
-</header>
+</nav>
 
-<!-- ================= Featured ================= -->
-<section class="featured">
-  <div class="wrap">
-    <span class="kicker">最新 / Latest</span>
-    <h1 id="feat-title"></h1>
-    <p class="excerpt" id="feat-excerpt"></p>
-    <div class="meta-row" id="feat-meta"></div>
-    <button class="read-link" id="feat-read">阅读全文 <span class="arrow">→</span></button>
+<!-- ================= Hero (featured article) ================= -->
+<section class="hero">
+  <p class="hero-kicker" id="feat-kicker"></p>
+  <h1 id="feat-title"></h1>
+  <p class="hero-sub" id="feat-excerpt"></p>
+  <div class="hero-meta" id="feat-meta"></div>
+  <div class="hero-ctas">
+    <button class="btn-blue" id="feat-read">阅读全文</button>
+    <a class="btn-outline-light" href="#posts">浏览全部文章</a>
   </div>
 </section>
 
-<!-- ================= Main ================= -->
-<div class="wrap grid" id="posts">
-  <main>
-    <div class="filter-bar" id="filterBar" role="tablist" aria-label="按标签筛选"></div>
-    <div class="section-label">全部文章 <span id="postCount"></span></div>
-    <ul class="post-list" id="postList"></ul>
-    <p class="empty-note" id="emptyNote">这个标签下还没有文章，去别处看看吧～</p>
-  </main>
+<!-- ================= Posts ================= -->
+<section class="posts-section" id="posts">
+  <div class="section-head">
+    <h2>全部文章。</h2>
+    <p>技术、翻译、偶像随笔，想到什么写什么。</p>
+  </div>
+  <div class="filter-bar" id="filterBar" role="tablist" aria-label="按标签筛选"></div>
+  <div class="grid" id="postGrid"></div>
+  <p class="empty-note" id="emptyNote">这个标签下还没有文章，去别处看看吧。</p>
+</section>
 
-  <aside class="sidebar" id="about">
-    <div class="side-block">
-      <h3>关于我</h3>
-      <div class="about-card">
-        <div class="avatar">M</div>
-        <p>Minori。写代码、做翻译、追偶像。相信认真记录生活的人运气不会太差。这里是存放技术笔记、本地化心得与追星随笔的地方。</p>
-      </div>
-    </div>
-    <div class="side-block">
-      <h3>分类</h3>
-      <ul class="cat-list" id="catList"></ul>
-    </div>
-    <div class="side-block">
-      <h3>链接</h3>
-      <ul class="cat-list">
-        <li><a href="https://github.com/minorri0414" target="_blank" rel="noopener">GitHub</a><span class="count">↗</span></li>
-        <li><a href="#">RSS 订阅</a><span class="count">↗</span></li>
-      </ul>
-    </div>
-  </aside>
-</div>
+<!-- ================= About ================= -->
+<section class="about" id="about">
+  <h2>关于 Minori。</h2>
+  <p class="about-body">写代码、做翻译、追偶像。相信认真记录生活的人运气不会太差。这里是存放技术笔记、本地化心得与追星随笔的地方——把散落的想法钉在时间上。</p>
+  <div class="hero-ctas">
+    <a class="btn-outline-light" href="https://github.com/minorri0414" target="_blank" rel="noopener">访问 GitHub ↗</a>
+  </div>
+</section>
+
+<!-- ================= Footer ================= -->
+<footer>
+  <div class="foot-inner">
+    <span>Copyright © 2026 Minori. 由热爱驱动，认真记录。</span>
+    <span><a href="#posts">文章</a> · <a href="#about">关于</a> · <a href="https://github.com/minorri0414" target="_blank" rel="noopener">GitHub</a></span>
+  </div>
+</footer>
 
 <!-- ================= Article reader ================= -->
 <div class="reader" id="reader" role="dialog" aria-modal="true">
-  <div class="wrap">
-    <button class="back-btn" onclick="closeReader()">← 返回列表</button>
-    <span class="kicker" id="reader-tag"></span>
+  <div class="reader-inner">
+    <button class="back-btn" onclick="closeReader()">‹ 返回文章列表</button>
+    <p class="reader-tag" id="reader-tag"></p>
     <h1 id="reader-title"></h1>
-    <div class="meta-row" id="reader-meta"></div>
-    <div class="body" id="reader-body"></div>
+    <p class="reader-meta" id="reader-meta"></p>
+    <div class="reader-body" id="reader-body"></div>
   </div>
 </div>
-
-<footer>
-  <div class="wrap">
-    <span>© 2026 Minori · 由热爱驱动，认真记录</span>
-    <span>本页面为静态原型 · <a href="#">查看源码</a></span>
-  </div>
-</footer>
 
 <script>
 /* ================= Data ================= */
@@ -450,31 +462,17 @@ const TAGS = [
 
 /* ================= State ================= */
 let activeTag = "all";
-
 const $ = (s) => document.querySelector(s);
-const fmtDate = (d) => {
-  const [y, m, day] = d.split("-");
-  return `${y}.${m}.${day}`;
-};
+const fmtDate = (d) => { const [y, m, day] = d.split("-"); return `${y} 年 ${Number(m)} 月 ${Number(day)} 日`; };
 
-/* ================= Theme ================= */
-const savedTheme = localStorage.getItem("blog-theme");
-if (savedTheme) document.documentElement.dataset.theme = savedTheme;
-$("#themeToggle").addEventListener("click", () => {
-  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem("blog-theme", next);
-});
-
-/* ================= Featured ================= */
+/* ================= Featured / Hero ================= */
 const featured = posts[0];
 function renderFeatured() {
+  $("#feat-kicker").textContent = "最新 · " + featured.tagLabel;
   $("#feat-title").textContent = featured.title;
   $("#feat-excerpt").textContent = featured.excerpt;
   $("#feat-meta").innerHTML =
-    `<span>${fmtDate(featured.date)}</span><span class="sep">·</span>` +
-    `<span>${featured.tagLabel}</span><span class="sep">·</span>` +
-    `<span>约 ${featured.minutes} 分钟</span>`;
+    `${fmtDate(featured.date)}<span class="sep">·</span>约 ${featured.minutes} 分钟阅读`;
   $("#feat-read").onclick = () => openReader(featured.id);
 }
 
@@ -488,49 +486,30 @@ function renderFilters() {
     btn.addEventListener("click", () => {
       activeTag = btn.dataset.tag;
       renderFilters();
-      renderList();
+      renderGrid();
     });
   });
 }
 
-/* ================= Post list ================= */
-function renderList() {
-  const list = $("#postList");
+/* ================= Post grid ================= */
+function renderGrid() {
+  const grid = $("#postGrid");
   const filtered = activeTag === "all" ? posts : posts.filter(p => p.tag === activeTag);
-  $("#postCount").textContent = `(${filtered.length})`;
   $("#emptyNote").style.display = filtered.length ? "none" : "block";
-  list.innerHTML = filtered.map((p, i) => `
-    <li class="post-item" data-id="${p.id}" style="animation-delay:${i * 40}ms" tabindex="0" role="button" aria-label="阅读：${p.title}">
-      <span class="post-date">${fmtDate(p.date)}</span>
-      <div>
-        <h2 class="post-title">${p.title}</h2>
-        <p class="post-excerpt">${p.excerpt}</p>
-        <div class="post-tags">
-          <span class="tag">${p.tagLabel}</span>
-          <span class="readtime">约 ${p.minutes} 分钟</span>
-        </div>
+  grid.innerHTML = filtered.map((p, i) => `
+    <article class="tile" data-id="${p.id}" style="animation-delay:${i * 50}ms" tabindex="0" role="button" aria-label="阅读：${p.title}">
+      <p class="tile-tag">${p.tagLabel}</p>
+      <h3>${p.title}</h3>
+      <p class="tile-excerpt">${p.excerpt}</p>
+      <div class="tile-foot">
+        <span class="tile-date">${fmtDate(p.date)} · 约 ${p.minutes} 分钟</span>
+        <span class="tile-link">阅读全文 <span class="chev">›</span></span>
       </div>
-    </li>`).join("");
-  list.querySelectorAll(".post-item").forEach(item => {
-    const open = () => openReader(Number(item.dataset.id));
-    item.addEventListener("click", open);
-    item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
-  });
-}
-
-/* ================= Sidebar categories ================= */
-function renderCats() {
-  const counts = {};
-  posts.forEach(p => counts[p.tagLabel] = (counts[p.tagLabel] || 0) + 1);
-  $("#catList").innerHTML = Object.entries(counts).map(([name, n]) => `
-    <li><button data-cat="${name}">${name}</button><span class="count">${n}</span></li>`).join("");
-  $("#catList").querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const t = TAGS.find(x => x.label === btn.dataset.cat);
-      activeTag = t ? t.key : "all";
-      renderFilters(); renderList();
-      document.getElementById("posts").scrollIntoView({ behavior: "smooth" });
-    });
+    </article>`).join("");
+  grid.querySelectorAll(".tile").forEach(tile => {
+    const open = () => openReader(Number(tile.dataset.id));
+    tile.addEventListener("click", open);
+    tile.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
   });
 }
 
@@ -540,16 +519,13 @@ function openReader(id) {
   if (!p) return;
   $("#reader-tag").textContent = p.tagLabel;
   $("#reader-title").textContent = p.title;
-  $("#reader-meta").innerHTML =
-    `<span>${fmtDate(p.date)}</span><span class="sep">·</span>` +
-    `<span>约 ${p.minutes} 分钟阅读</span>`;
+  $("#reader-meta").innerHTML = `${fmtDate(p.date)}<span class="sep">·</span>约 ${p.minutes} 分钟阅读`;
   $("#reader-body").innerHTML = p.body.map(t => `<p>${t}</p>`).join("");
   $("#reader").classList.add("open");
   $("#reader").scrollTop = 0;
   document.body.style.overflow = "hidden";
 }
-function closeReader(e) {
-  if (e) e.preventDefault();
+function closeReader() {
   $("#reader").classList.remove("open");
   document.body.style.overflow = "";
 }
@@ -558,8 +534,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeReader(
 /* ================= Init ================= */
 renderFeatured();
 renderFilters();
-renderList();
-renderCats();
+renderGrid();
 </script>
 </body>
 </html>
