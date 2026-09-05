@@ -654,7 +654,24 @@
 
 <script>
 /* ================= Data ================= */
-const posts = [];
+const posts = [
+  {
+    id: 'post-20260115-4',
+    title: '测试文章',
+    date: '2026-01-15',
+    tags: ['测试', '工具'],
+    summary: '这是一篇测试文章，验证发文脚本',
+    content: `## 正文内容
+
+这是测试文章的正文部分。
+
+你可以写多行内容，支持 **Markdown 格式**。
+
+---
+
+文章结束。`
+  }
+  ];
 const TAGS = [
   { key: "all", label: "全部" },
   { key: "tech", label: "技术" },
